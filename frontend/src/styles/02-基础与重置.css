@@ -1,0 +1,276 @@
+/* ============================================================================
+ * 02-基础与重置.css —— 全局重置、排版基线、通用原子类
+ * ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  /* 移动端点击不再有 300ms 延迟与灰色高亮 */
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: var(--lh-normal);
+  color: var(--c-ink-700);
+  /* 底色不是一张纯灰纸：左上暖阳光 + 远处天光 + 极淡笔触先铺一层大气，
+     登录页这类没有 .app-shell 的整屏页面也直接吃这一层。 */
+  background: var(--page-wash), var(--page-brushes), var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-numeric: tabular-nums; /* 中文系统里数字默认不等宽，统一开 */
+  overflow: hidden; /* 滚动交给内部容器，避免双滚动条 */
+}
+
+/* 暗色模式下让滚动条也变深，否则白条很刺眼 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-ink-200) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--c-ink-200);
+  border: 2px solid transparent;
+  border-radius: var(--r-full);
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--c-ink-300);
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ------------------------------------------------------------ 标题层级 */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  color: var(--c-ink-900);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+}
+
+h1 { font-size: var(--fs-2xl); }
+h2 { font-size: var(--fs-xl); }
+h3 { font-size: var(--fs-lg); }
+h4 { font-size: var(--fs-md); }
+h5 { font-size: var(--fs-base); }
+h6 { font-size: var(--fs-sm); }
+
+p {
+  margin: 0 0 var(--sp-3);
+}
+
+a {
+  color: var(--c-brand-600);
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+a:hover {
+  color: var(--c-brand-500);
+}
+
+/* 键盘可达性：只对键盘聚焦显示焦点环，鼠标点击不显示 */
+:focus-visible {
+  outline: 2px solid var(--c-brand-500);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* 选中文字用品牌色，避免默认蓝与主题冲突 */
+::selection {
+  background: var(--c-brand-100);
+  color: var(--c-brand-800);
+}
+
+/* ============================================================================
+ * 通用原子类（只收高频、语义明确的，不做完整 tailwind）
+ * ========================================================================== */
+
+/* 数字：等宽 + 表格数字对齐，金额列必备 */
+.num,
+.tabular {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: -0.01em;
+}
+
+/* 增减色：库存变动 / 毛利正负 */
+.up { color: var(--c-up); }
+.down { color: var(--c-down); }
+.flat { color: var(--c-flat); }
+
+.text-muted { color: var(--c-ink-400); }
+.text-faint { color: var(--c-ink-300); }
+.text-strong { color: var(--c-ink-900); font-weight: var(--fw-semibold); }
+.text-danger { color: var(--c-danger-500); }
+.text-success { color: var(--c-success-500); }
+.text-warning { color: var(--c-warning-700); }
+.text-brand { color: var(--c-brand-600); }
+.text-debit { color: var(--c-debit); }
+.text-credit { color: var(--c-credit); }
+.text-xs { font-size: var(--fs-xs); }
+.text-sm { font-size: var(--fs-sm); }
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 间距工具类：与 --sp-* 同名同值，避免页面各写各的 margin */
+.mt-1 { margin-top: var(--sp-1); }
+.mt-2 { margin-top: var(--sp-2); }
+.mt-3 { margin-top: var(--sp-3); }
+.mt-4 { margin-top: var(--sp-4); }
+.mt-6 { margin-top: var(--sp-6); }
+.mb-2 { margin-bottom: var(--sp-2); }
+.mb-3 { margin-bottom: var(--sp-3); }
+.mb-4 { margin-bottom: var(--sp-4); }
+.ml-1 { margin-left: var(--sp-1); }
+.gap-1 { gap: var(--sp-1); }
+.gap-2 { gap: var(--sp-2); }
+.gap-3 { gap: var(--sp-3); }
+
+/* 弹性布局三件套：页面里到处要"左对齐一堆 + 右侧一个按钮" */
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.row-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.spacer {
+  flex: 1 1 auto;
+  min-width: var(--sp-2);
+}
+
+/* 卡片化容器：所有页面主体统一用它，不再各自写 border-radius。
+   分离靠"顶边受光 + 一层有色软影"，边框只是最后补的一道淡雾 —— 
+   硬描边会把形切碎，印象派要的是轮廓溶进环境光里。 */
+.surface {
+  background: var(--surface-sheen), var(--bg-surface);
+  border: 1px solid var(--c-border-light);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-sm), var(--rim-lit);
+}
+
+.surface-pad {
+  padding: var(--sp-4);
+}
+
+/* 章节小标题：卡片里分组的名字，统一"左竖条 + 文字"样式 */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--c-ink-800);
+  letter-spacing: var(--ls-wide);
+}
+
+/* 竖条是"透光的一小段"：品牌蓝到琥珀的并置（互补色相邻才最有活力） */
+.section-title::before {
+  content: '';
+  width: 3px;
+  height: 14px;
+  border-radius: var(--r-full);
+  background: linear-gradient(180deg, var(--c-brand-400), var(--c-accent-500));
+  box-shadow: var(--glow-brand);
+}
+
+/* 徽标/计数：右上角红点数字 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--r-full);
+  background: var(--c-danger-500);
+  color: #fff;
+  font-size: 11px;
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+}
+
+/* 空态：表格无数据 / 列表为空，统一图形与文案的间距 */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  padding: var(--sp-10) var(--sp-4);
+  color: var(--c-ink-400);
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 40px;
+  color: var(--c-ink-200);
+}
+
+/* 骨架屏：加载中的占位，比转圈更少"页面跳动"。
+   微光是斜着扫过去的暖光，不是左右刷一条白漆。 */
+.skeleton {
+  background: linear-gradient(
+    100deg,
+    var(--c-ink-50) 25%,
+    color-mix(in srgb, var(--c-accent-400) 16%, var(--bg-hover)) 42%,
+    var(--c-ink-50) 62%
+  );
+  background-size: 400% 100%;
+  border-radius: var(--r-md);
+  animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}

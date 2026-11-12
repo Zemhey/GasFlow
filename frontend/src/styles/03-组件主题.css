@@ -1,0 +1,542 @@
+/* ============================================================================
+ * 03-组件主题.css —— Element Plus 外观接管
+ * ----------------------------------------------------------------------------
+ * 思路：Element Plus 2.x 自身就以 CSS 变量暴露主题（--el-*）。
+ * 所以**先把 --el-* 映射到我们的令牌**，让 90% 的组件自动变样；
+ * 只有映射表达不了的地方（表格密度、卡片阴影、对话框圆角等）才写具体规则。
+ * 这样升级 Element Plus 时冲突面最小。
+ * ========================================================================== */
+
+:root {
+  /* ---------------------------------------------------------- 主色与语义 */
+  --el-color-primary: var(--c-brand-500);
+  --el-color-primary-light-3: var(--c-brand-400);
+  --el-color-primary-light-5: var(--c-brand-300);
+  --el-color-primary-light-7: var(--c-brand-200);
+  --el-color-primary-light-8: var(--c-brand-100);
+  --el-color-primary-light-9: var(--c-brand-50);
+  --el-color-primary-dark-2: var(--c-brand-600);
+
+  --el-color-success: var(--c-success-500);
+  --el-color-success-light-9: var(--c-success-50);
+  --el-color-success-dark-2: var(--c-success-700);
+
+  --el-color-warning: var(--c-warning-500);
+  --el-color-warning-light-9: var(--c-warning-50);
+  --el-color-warning-dark-2: var(--c-warning-700);
+
+  --el-color-danger: var(--c-danger-500);
+  --el-color-danger-light-9: var(--c-danger-50);
+  --el-color-danger-dark-2: var(--c-danger-700);
+  --el-color-error: var(--c-danger-500);
+  --el-color-error-light-9: var(--c-danger-50);
+
+  --el-color-info: var(--c-info-500);
+  --el-color-info-light-9: var(--c-info-50);
+  --el-color-info-dark-2: var(--c-info-700);
+
+  /* ------------------------------------------------------------ 文字与边框 */
+  --el-text-color-primary: var(--c-ink-900);
+  --el-text-color-regular: var(--c-ink-700);
+  --el-text-color-secondary: var(--c-ink-400);
+  --el-text-color-placeholder: var(--c-ink-300);
+  --el-text-color-disabled: var(--c-ink-300);
+  --el-text-color-primary: var(--c-ink-900);
+
+  --el-border-color: var(--c-border);
+  --el-border-color-light: var(--c-border-light);
+  --el-border-color-lighter: var(--c-ink-100);
+  --el-border-color-extra-light: var(--c-ink-50);
+  --el-border-color-hover: var(--c-border-strong);
+  --el-border-color-darker: var(--c-ink-300);
+
+  --el-fill-color: var(--c-ink-50);
+  --el-fill-color-light: var(--c-ink-50);
+  --el-fill-color-lighter: var(--c-ink-50);
+  --el-fill-color-blank: var(--bg-surface);
+  --el-fill-color-dark: var(--c-ink-100);
+  --el-fill-color-darker: var(--c-ink-200);
+  --el-bg-color: var(--bg-surface);
+  --el-bg-color-page: var(--bg-page);
+  --el-bg-color-overlay: var(--bg-surface);
+
+  /* ------------------------------------------------------------ 圆角与阴影 */
+  --el-border-radius-base: var(--r-md);
+  --el-border-radius-small: var(--r-sm);
+  --el-border-radius-round: var(--r-full);
+
+  --el-box-shadow: var(--sh-md);
+  --el-box-shadow-light: var(--sh-sm);
+  --el-box-shadow-lighter: var(--sh-xs);
+  --el-box-shadow-dark: var(--sh-lg);
+
+  /* ------------------------------------------------------------ 字体与字号 */
+  --el-font-family: var(--font-sans);
+  --el-font-size-base: var(--fs-base);
+  --el-font-size-small: var(--fs-sm);
+  --el-font-size-extra-small: var(--fs-xs);
+  --el-font-size-large: var(--fs-md);
+  --el-font-weight-primary: var(--fw-medium);
+
+  /* -------------------------------------------------------------- 控件高度 */
+  --el-component-size: var(--ctl-h);
+  --el-component-size-small: var(--ctl-h-sm);
+  --el-component-size-large: var(--ctl-h-lg);
+
+  --el-transition-duration: var(--dur-base);
+  --el-transition-duration-fast: var(--dur-fast);
+
+  --el-disabled-bg-color: var(--c-ink-50);
+  --el-disabled-text-color: var(--c-ink-300);
+  --el-disabled-border-color: var(--c-ink-200);
+
+  --el-overlay-color-lighter: var(--bg-mask);
+  --el-mask-color: rgba(255, 255, 255, 0.9);
+}
+
+html.dark {
+  --el-mask-color: rgba(19, 26, 35, 0.8);
+  --el-border-color: var(--c-border);
+  --el-border-color-light: var(--c-border-light);
+}
+
+/* ============================================================================
+ * 按钮：统一高度、字重与"按压位移"，让点击有物理反馈
+ * ========================================================================== */
+.el-button {
+  font-weight: var(--fw-medium);
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.el-button:not(.is-disabled):active {
+  transform: translateY(1px);
+}
+
+/* 主按钮：颜色不是平涂，是"上面被天光照亮、往下沉"的一小段渐层；
+   悬浮时代码往上走一档（更亮）并透出光晕，而不是只换个色号。 */
+.el-button--primary {
+  background-image: linear-gradient(178deg, var(--c-brand-400), var(--c-brand-600));
+  border-color: var(--c-brand-600);
+  box-shadow: 0 1px 2px hsl(var(--sh-ink) / 0.12), var(--rim-lit);
+}
+
+.el-button--primary:not(.is-disabled):hover {
+  background-image: linear-gradient(178deg, var(--c-brand-300), var(--c-brand-500));
+  border-color: var(--c-brand-500);
+  box-shadow: var(--glow-brand), var(--rim-lit);
+}
+
+.el-button--primary:not(.is-disabled):active {
+  background-image: linear-gradient(178deg, var(--c-brand-500), var(--c-brand-700));
+}
+
+/* 表格里的"链接型"按钮：增大点按热区（移动端可见性），并加下划线反馈 */
+.el-button.is-link {
+  font-weight: var(--fw-medium);
+  padding: 2px var(--sp-1);
+  height: auto;
+  border-radius: var(--r-xs);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.el-button.is-link:hover {
+  background: var(--bg-hover);
+  text-decoration: none;
+}
+
+/* ============================================================================
+ * 卡片：分离靠"顶边受光 + 有色软影"，边框只当一层淡雾留着。
+ * 圆角再放一档（--r-xl）：直角在密集表格里像硬描边，柔化后一块块才像"受光的面"。
+ * ========================================================================== */
+.el-card {
+  border: 1px solid var(--c-border-light);
+  border-radius: var(--r-xl);
+  background: var(--surface-sheen), var(--bg-surface);
+  box-shadow: var(--sh-sm), var(--rim-lit);
+  overflow: hidden;
+  transition:
+    box-shadow var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+
+.el-card.is-always-shadow,
+.el-card.is-hover-shadow:hover {
+  box-shadow: var(--sh-md), var(--rim-lit);
+}
+
+/* 卡头"往后退"：上亮下冷的渐层，而不是平涂一条灰 */
+.el-card__header {
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--c-border-light);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--c-ink-800);
+  background: var(--bg-far);
+  letter-spacing: var(--ls-wide);
+}
+
+.el-card__body {
+  padding: var(--sp-4);
+}
+
+/* ============================================================================
+ * 表格：本次改版的重点 —— 密度、表头粘性、斑马纹、悬浮、数字对齐
+ * ========================================================================== */
+.el-table {
+  --el-table-border-color: var(--c-border-light);
+  --el-table-header-bg-color: var(--bg-surface-alt);
+  --el-table-header-text-color: var(--c-ink-500);
+  --el-table-text-color: var(--c-ink-700);
+  --el-table-row-hover-bg-color: var(--bg-hover);
+  --el-table-current-row-bg-color: var(--c-brand-50);
+  --el-table-tr-bg-color: var(--bg-surface);
+  font-size: var(--fs-sm);
+}
+
+/* 表头：小一号、字距略宽、底色"上亮下沉"的退后渐层 —— 让表头"退后"，数据"向前" */
+.el-table th.el-table__cell {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-wider);
+  text-transform: none;
+  color: var(--c-ink-500);
+  background: var(--bg-far) !important;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--c-border) !important;
+  white-space: nowrap;
+}
+
+.el-table td.el-table__cell {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--c-border-light) !important;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+/* 斑马纹：极浅，只用来"串行"，不抢注意力 */
+.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+  background: var(--bg-surface-alt);
+}
+
+.el-table__body tr:hover > td.el-table__cell {
+  background: var(--bg-hover) !important;
+}
+
+/* 行悬浮时左侧出现品牌色竖条：鼠标在哪一行一眼可见（长表格尤其有用） */
+.el-table__body tr > td.el-table__cell:first-child {
+  position: relative;
+}
+
+.el-table__body tr > td.el-table__cell:first-child::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: transparent;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.el-table__body tr:hover > td.el-table__cell:first-child::before {
+  background: linear-gradient(180deg, var(--c-brand-400), var(--c-accent-500));
+}
+
+/* 合计行：加重、底色退后，与普通行区分 */
+.el-table__footer-wrapper td.el-table__cell,
+.el-table__footer {
+  background: var(--bg-far) !important;
+  font-weight: var(--fw-semibold);
+  color: var(--c-ink-900);
+  border-top: 2px solid var(--c-border) !important;
+}
+
+/* 固定列阴影：滚动时"列被压住"的层次感 */
+.el-table__fixed-right::before,
+.el-table__fixed::before {
+  background: linear-gradient(to right, transparent, hsl(var(--sh-ink) / 0.08)) !important;
+}
+
+.el-table__fixed-right-patch {
+  background: var(--bg-sunken) !important;
+}
+
+/* 空数据文案：统一字号与颜色 */
+.el-table__empty-block {
+  min-height: 180px;
+}
+
+.el-table__empty-text {
+  color: var(--c-ink-400);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-loose);
+}
+
+/* 排序箭头在未激活时降透明度，激活才显现 */
+.el-table .caret-wrapper .sort-caret {
+  border-width: 4px;
+}
+
+/* ============================================================================
+ * 表单：标签对齐、必填星号位置、错误态、只读态
+ * ========================================================================== */
+.el-form-item__label {
+  color: var(--c-ink-500);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  line-height: 1.4;
+  padding-right: var(--sp-3);
+}
+
+/* 必填星号放在标签前，红点小且不刺眼 */
+.el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label::before {
+  color: var(--c-danger-500);
+  font-size: 12px;
+  margin-right: 2px;
+}
+
+.el-form-item__error {
+  font-size: var(--fs-xs);
+  color: var(--c-danger-500);
+  padding-top: 2px;
+}
+
+/* 输入框：聚焦时"品牌色细环"，比默认边框变色更明显且不改变布局 */
+.el-input__wrapper,
+.el-textarea__inner,
+.el-select__wrapper {
+  transition:
+    box-shadow var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.el-input__wrapper.is-focus,
+.el-select__wrapper.is-focused {
+  box-shadow: 0 0 0 1px var(--c-brand-500) inset, var(--sh-focus) !important;
+}
+
+.el-textarea__inner:focus {
+  box-shadow: 0 0 0 1px var(--c-brand-500) inset, var(--sh-focus) !important;
+}
+
+/* 只读/禁用：底色更浅，文字仍可读但明显不可编辑 */
+.el-input.is-disabled .el-input__wrapper,
+.el-textarea.is-disabled .el-textarea__inner,
+.el-select.is-disabled .el-select__wrapper {
+  background: var(--c-ink-50) !important;
+  box-shadow: 0 0 0 1px var(--c-border-light) inset !important;
+}
+
+.el-input.is-disabled .el-input__inner {
+  color: var(--c-ink-500);
+  -webkit-text-fill-color: var(--c-ink-500);
+}
+
+/* ============================================================================
+ * 标签 / 徽章：统一"浅底 + 深字"，与单据状态机颜色一一对应
+ * ========================================================================== */
+.el-tag {
+  border-radius: var(--r-md);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-wide);
+  border-width: 1px;
+}
+
+.el-tag--small {
+  height: 20px;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+/* effect="light" 的标签：用语义色文字 + 浅底，避免默认"实心块"过重 */
+.el-tag--light {
+  border-color: currentColor;
+}
+
+.el-tag--primary.el-tag--light { background: var(--c-brand-50); color: var(--c-brand-700); border-color: var(--c-brand-200); }
+.el-tag--success.el-tag--light { background: var(--c-success-50); color: var(--c-success-700); border-color: #bfe3cd; }
+.el-tag--warning.el-tag--light { background: var(--c-warning-50); color: var(--c-warning-700); border-color: #f2dcb0; }
+.el-tag--danger.el-tag--light  { background: var(--c-danger-50); color: var(--c-danger-700); border-color: #f2c9c5; }
+.el-tag--info.el-tag--light    { background: var(--c-info-50); color: var(--c-info-700); border-color: var(--c-ink-200); }
+
+/* ============================================================================
+ * 分页 / 下拉 / 对话框 / 抽屉 / 提示
+ * ========================================================================== */
+.el-pagination {
+  --el-pagination-button-bg-color: transparent;
+  font-weight: var(--fw-medium);
+  gap: var(--sp-1);
+}
+
+.el-pagination.is-background .el-pager li {
+  border-radius: var(--r-sm);
+  transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.el-pagination.is-background .el-pager li:not(.is-active):hover {
+  background: var(--c-brand-50);
+  color: var(--c-brand-600);
+}
+
+.el-pagination.is-background .el-pager li.is-active {
+  background: var(--c-brand-500);
+  box-shadow: var(--glow-brand);
+}
+
+.el-select-dropdown__item.is-selected {
+  color: var(--c-brand-600);
+  font-weight: var(--fw-semibold);
+}
+
+.el-select-dropdown__item.is-hovering {
+  background: var(--bg-hover);
+}
+
+.el-dropdown-menu__item:not(.is-disabled):hover {
+  background: var(--c-brand-50);
+  color: var(--c-brand-600);
+}
+
+/* 对话框：浮在最远的一层，所以给它最大的柔化半径与最深的一段有色影 */
+.el-dialog {
+  border-radius: var(--r-xl);
+  background: var(--surface-sheen), var(--bg-surface);
+  box-shadow: var(--sh-xl), var(--rim-lit);
+  overflow: hidden;
+}
+
+.el-dialog__header {
+  margin-right: 0;
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--c-border-light);
+  background: var(--bg-far);
+}
+
+.el-dialog__title {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  color: var(--c-ink-900);
+}
+
+.el-dialog__body {
+  padding: var(--sp-5);
+  color: var(--c-ink-700);
+}
+
+.el-dialog__footer {
+  padding: var(--sp-3) var(--sp-5) var(--sp-4);
+  border-top: 1px solid var(--c-border-light);
+  background: var(--bg-far);
+}
+
+.el-drawer__header {
+  margin-bottom: 0;
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--c-border-light);
+  color: var(--c-ink-900);
+  font-weight: var(--fw-semibold);
+}
+
+.el-message-box {
+  border-radius: var(--r-xl);
+  padding: var(--sp-5);
+  box-shadow: var(--sh-xl), var(--rim-lit);
+}
+
+.el-message-box__title {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  color: var(--c-ink-900);
+}
+
+.el-message {
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-lg), var(--rim-lit);
+  border-width: 1px;
+  min-width: 260px;
+}
+
+.el-message--error { background: var(--c-danger-50); border-color: #f2c9c5; }
+.el-message--success { background: var(--c-success-50); border-color: #bfe3cd; }
+.el-message--warning { background: var(--c-warning-50); border-color: #f2dcb0; }
+
+.el-alert {
+  border-radius: var(--r-md);
+  border-width: 1px;
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.el-alert__title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+}
+
+/* 描述列表：详情页常用，统一"标签浅、值深" */
+.el-descriptions__label {
+  color: var(--c-ink-500) !important;
+  font-weight: var(--fw-medium) !important;
+  font-size: var(--fs-xs);
+}
+
+.el-descriptions__content {
+  color: var(--c-ink-900);
+  font-size: var(--fs-sm);
+}
+
+/* 描述列表、下拉浮层等"飘在远处"的表面：柔化半径放一档，边缘补一层受光 */
+.el-picker__popper,
+.el-popper.is-light {
+  border-radius: var(--r-lg) !important;
+  border-color: var(--c-border-light) !important;
+  box-shadow: var(--sh-lg), var(--rim-lit) !important;
+}
+
+.el-date-table td.current:not(.disabled) .el-date-table-cell__text {
+  background: var(--c-brand-500);
+}
+
+.el-date-table td.today .el-date-table-cell__text {
+  color: var(--c-brand-600);
+  font-weight: var(--fw-semibold);
+}
+
+/* 加载遮罩：用半透明表面色，不用默认偏白的整块 */
+.el-loading-mask {
+  background-color: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(1px);
+}
+
+html.dark .el-loading-mask {
+  background-color: rgba(19, 26, 35, 0.72);
+}
+
+.el-loading-spinner .path {
+  stroke: var(--c-brand-500);
+}
+
+/* 进度条 / 步骤条 */
+.el-progress-bar__inner {
+  border-radius: var(--r-full);
+}
+
+.el-step__title.is-process {
+  font-weight: var(--fw-semibold);
+  color: var(--c-brand-600);
+}
+
+/* 面包屑（详情页用） */
+.el-breadcrumb__inner {
+  color: var(--c-ink-400);
+  font-weight: var(--fw-normal);
+}
+
+.el-breadcrumb__item:last-child .el-breadcrumb__inner {
+  color: var(--c-ink-700);
+  font-weight: var(--fw-medium);
+}

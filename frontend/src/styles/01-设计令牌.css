@@ -1,0 +1,363 @@
+/* ============================================================================
+ * 01-设计令牌.css —— 瓶装气进销存系统 v3 · 视觉基石
+ * ----------------------------------------------------------------------------
+ * 这里是**唯一**定义颜色 / 字体 / 间距 / 圆角 / 阴影 / 动效的地方。
+ * 页面与组件只允许引用变量（var(--xxx)），不允许再写死十六进制色值 ——
+ * 这样换肤、暗色模式、打印预览都只需改本文件的覆盖块。
+ *
+ * 命名约定：
+ *   --c-*     颜色（color）      --sp-*  间距（space，4px 基准栅格）
+ *   --fs-*    字号（font-size）  --r-*   圆角（radius）
+ *   --sh-*    阴影（shadow）     --z-*    层级（z-index）
+ *   --dur- / --ease-  动效时长与曲线
+ * ========================================================================== */
+
+:root {
+  /* ---------------------------------------------------------------- 品牌色 */
+  /* 燃气行业用"深靛蓝 + 暖琥珀"：蓝代表工业可靠，琥珀是火焰，
+     既区别于 Element Plus 默认的 #409EFF（避免"套壳感"），又保持专业。 */
+  --c-brand-50: #eff5ff;
+  --c-brand-100: #dbe8fe;
+  --c-brand-200: #bfd7fe;
+  --c-brand-300: #93bbfd;
+  --c-brand-400: #609afa;
+  --c-brand-500: #2b7de9; /* 主色：按钮 / 链接 / 选中态 */
+  --c-brand-600: #1d64c9;
+  --c-brand-700: #1a4fa1;
+  --c-brand-800: #1b4385;
+  --c-brand-900: #1c3a6e;
+
+  --c-accent-400: #ffc94d;
+  --c-accent-500: #f5a623; /* 强调色：火焰琥珀，用于关键数值/警示强调 */
+  --c-accent-600: #d98a10;
+
+  /* ============================================================================
+   * 光色模型（全站只有一束光）
+   * --------------------------------------------------------------------------
+   * 之前的问题是"摄影棚平光"：阴影是中性黑、描边是中性灰、表面是平涂白，
+   * 每一块颜色各自为政，页面没有"被同一片天光照着"的整体感。这里改成户外光：
+   *   · 一束暖天光从左上方进入 —— 表面顶边受光（--lit-warm）、底边落冷影；
+   *   · 阴影不是黑的，是被天空染过的靛紫（--sh-ink），并带一丝琥珀反弹光；
+   *   · 页面底用"破碎色"：琥珀光斑与天蓝反光两块低透明并置，让眼睛在远处混色，
+   *     而不是在代码里预先混成一个灰 —— 这就是 --page-wash 的全部用意。
+   * 反面对照（不要做回这些）：硬描边、平涂大色块、均匀无影的平光。
+   * ========================================================================== */
+  --lit-x: 20%; /* 光源水平位置 */
+  --lit-y: -6rem; /* 光源垂直位置（画布上沿之外，光斜射进来） */
+  --lit-warm: rgba(255, 246, 230, 0.9); /* 表面顶边的受光高光 */
+  --surface-sheen: linear-gradient(
+    168deg,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(255, 255, 255, 0) 46%
+  ); /* 由左上到右下衰减的受光面 */
+  --rim-lit: inset 0 1px 0 var(--lit-warm); /* 边缘光（代替硬描边做"分离"） */
+
+  /* 阴影色：HSL 分量，方便同一色相叠多层不同浓度（低浓度多层 > 单层黑影） */
+  --sh-ink: 231 39% 26%;
+  --sh-bounce: 36 92% 55%; /* 暖光落到桌面边缘的反弹 */
+
+  /* 页面底的大气层：暖阳光 + 远处天光 + 极淡笔触（--page-brush 负责"看得见的手"）。
+     笔触要淡到"看不出有图案、但底色不干净"为止 —— 浓度一过 1.5% 就成了屏幕划痕。 */
+  --page-sun: rgba(255, 201, 77, 0.09);
+  --page-sky: rgba(147, 187, 253, 0.15);
+  --page-brush: rgba(43, 125, 233, 0.014);
+  --page-wash:
+    radial-gradient(68rem 38rem at var(--lit-x) var(--lit-y), var(--page-sun), transparent 62%),
+    radial-gradient(54rem 34rem at 94% 106%, var(--page-sky), transparent 58%);
+  --page-brushes: repeating-linear-gradient(
+    104deg,
+    var(--page-brush) 0 4px,
+    transparent 4px 15px
+  );
+
+  /* 发光（关键元素用"透光"而不是"描边"表达存在感） */
+  --glow-brand: 0 6px 18px -6px hsl(213 83% 54% / 0.5);
+  --glow-accent: 0 8px 22px -8px hsl(36 92% 55% / 0.55);
+
+  /* ------------------------------------------------------------------ 中性 */
+  --c-ink-900: #17212f; /* 标题 */
+  --c-ink-800: #24313f;
+  --c-ink-700: #35424f;
+  --c-ink-600: #4a5866; /* 正文 */
+  --c-ink-500: #667380;
+  --c-ink-400: #8b96a3; /* 次要文字 */
+  --c-ink-300: #b6bec9; /* 占位符 */
+  --c-ink-200: #d5dbe3; /* 边框 */
+  --c-ink-100: #e8ecf1; /* 分隔线 */
+  --c-ink-50:  #f4f6f9; /* 斑马纹 / 悬浮底 */
+  --c-white:   #ffffff;
+
+  /* ------------------------------------------------------------- 语义状态 */
+  --c-success-50: #eaf7ef;
+  --c-success-500: #1e9e5a;
+  --c-success-700: #157347;
+
+  --c-warning-50: #fff7e6;
+  --c-warning-500: #f5a623;
+  --c-warning-700: #b87400;
+
+  --c-danger-50: #fdeeed;
+  --c-danger-500: #d9483b;
+  --c-danger-700: #a8291e;
+
+  --c-info-50: #eef2f7;
+  --c-info-500: #667380;
+  --c-info-700: #4a5866;
+
+  /* 业务语义色（表格里区分"增/减/平"与"借/贷"） */
+  --c-up: #1e9e5a;
+  --c-down: #d9483b;
+  --c-flat: #b6bec9;
+  --c-debit: #1d64c9;
+  --c-credit: #d9483b;
+
+  /* ------------------------------------------------------- 背景与表面层次 */
+  /* 层次靠"色温 + 明度"拉开，不靠描边：越远的底越冷越淡，越近的表面越亮越暖。 */
+  --bg-page: #f3f5fa;   /* 页面底：比卡片暗一档，卡片才"浮"得起来 */
+  --bg-surface: #ffffff;
+  --bg-surface-alt: #fafbfd;
+  --bg-sunken: #eef2f8; /* 凹进去的槽：偏冷，与受光的表面形成温度对比 */
+  --bg-hover: #f2f5fa;
+  --bg-active: var(--c-brand-50);
+  --bg-mask: rgba(23, 33, 47, 0.42);
+  /* "退到后面"的表面（表头 / 筛选条 / 合计条）：上亮下冷，越远越沉 */
+  --bg-far: linear-gradient(180deg, var(--bg-surface-alt) 0%, var(--bg-sunken) 100%);
+
+  /* 侧边栏（深色导航）：暮色底 + 炉火光晕，不是平涂深灰 */
+  --side-bg: #17212f;
+  --side-bg-sub: #1f2b3c;
+  --side-item-hover: #232f41;
+  --side-item-active: #2b7de9;
+  --side-text: #a9b4c2;
+  --side-text-active: #ffffff;
+  --side-group-title: #6f7d8e;
+  --side-border: #2a3648;
+  --side-lit-edge: rgba(255, 255, 255, 0.06); /* 每一条分隔线都当"受光的边"处理 */
+  --side-wash:
+    radial-gradient(24rem 13rem at 12% -3%, rgba(255, 201, 77, 0.15), transparent 62%),
+    radial-gradient(30rem 22rem at 112% 92%, rgba(96, 138, 205, 0.2), transparent 66%),
+    linear-gradient(178deg, #1f2b3d 0%, #18222f 46%, #141c28 100%);
+  --side-group-bg: rgba(255, 255, 255, 0.028); /* 分组按钮的静止态：几乎透明，靠字色分层 */
+  --side-group-bg-hover: rgba(255, 255, 255, 0.06);
+  --side-group-bg-open: rgba(43, 125, 233, 0.16); /* 展开中的分组：透出一层天光 */
+
+  /* 顶栏 */
+  --header-bg: rgba(255, 255, 255, 0.82); /* 毛玻璃：滚动时内容从底下透出 */
+  --header-border: var(--c-ink-100);
+
+  /* ---------------------------------------------------------------- 边框 */
+  --c-border: var(--c-ink-200);
+  --c-border-light: var(--c-ink-100);
+  --c-border-strong: var(--c-ink-300);
+
+  /* ------------------------------------------------------------ 字体排版 */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei',
+    'PingFang SC', 'Hiragino Sans GB', 'Noto Sans CJK SC', Roboto, sans-serif;
+  /* 数字等宽：金额列必须对齐，否则一列钱看着像在跳 */
+  --font-num: 'SF Mono', 'JetBrains Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-base: 14px;
+  --fs-md: 15px;
+  --fs-lg: 16px;
+  --fs-xl: 18px;
+  --fs-2xl: 22px;
+  --fs-3xl: 28px;
+  --fs-4xl: 34px;
+
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --lh-tight: 1.25;
+  --lh-normal: 1.5;
+  --lh-loose: 1.7;
+
+  --ls-tight: -0.01em;
+  --ls-wide: 0.02em;
+  --ls-wider: 0.06em;
+
+  /* ------------------------------------------------------------ 间距栅格 */
+  /* 4px 基准：所有 margin/padding/gap 只能取这些值，页面节奏才一致 */
+  --sp-0: 0;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* ---------------------------------------------------------------- 圆角 */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+  --r-full: 999px;
+
+  /* ---------------------------------------------------------------- 阴影 */
+  /* 阴影一律带色温（--sh-ink 是靛紫，不是黑），并且低浓度叠多层：
+     单层大黑影 = 剪纸；多层彩色淡影 = 空气里的一段距离。
+     最底一层用暖反弹光（--sh-bounce），把物体"落在被晒暖的桌面上"这件事说出来。 */
+  --sh-xs: 0 1px 2px hsl(var(--sh-ink) / 0.05);
+  --sh-sm:
+    0 1px 2px hsl(var(--sh-ink) / 0.05),
+    0 2px 6px -1px hsl(var(--sh-ink) / 0.06),
+    0 1px 0 hsl(var(--sh-bounce) / 0.04);
+  --sh-md:
+    0 2px 4px -2px hsl(var(--sh-ink) / 0.06),
+    0 6px 14px -4px hsl(var(--sh-ink) / 0.09),
+    0 2px 4px hsl(var(--sh-bounce) / 0.04);
+  --sh-lg:
+    0 4px 8px -4px hsl(var(--sh-ink) / 0.08),
+    0 14px 30px -8px hsl(var(--sh-ink) / 0.14),
+    0 4px 10px hsl(var(--sh-bounce) / 0.04);
+  --sh-xl:
+    0 8px 16px -8px hsl(var(--sh-ink) / 0.12),
+    0 26px 54px -12px hsl(var(--sh-ink) / 0.2);
+  --sh-focus: 0 0 0 3px rgba(43, 125, 233, 0.18);
+  --sh-danger-focus: 0 0 0 3px rgba(217, 72, 59, 0.18);
+
+  /* ------------------------------------------------------------ 动效曲线 */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);      /* 进入：快起慢收 */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);    /* 通用 */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* 回弹：用于勾选/展开 */
+
+  /* ---------------------------------------------------------------- 层级 */
+  --z-sticky: 100;
+  --z-header: 200;
+  --z-drawer: 1000;
+  --z-mask: 1100;
+  --z-toast: 3000;
+
+  /* ------------------------------------------------------------ 布局尺寸 */
+  --side-w: 232px;
+  --side-w-collapsed: 64px;
+  --header-h: 58px;
+  --content-max: 1760px; /* 超宽屏不再无限拉长，阅读性更好 */
+
+  /* 表格行高 / 控件高度：Element Plus 用这些变量控制密度 */
+  --ctl-h-sm: 30px;
+  --ctl-h: 34px;
+  --ctl-h-lg: 40px;
+}
+
+/* ============================================================================
+ * 暗色模式：只覆盖令牌，不改任何组件代码。
+ * 通过 <html class="dark"> 或系统偏好启用（main.ts 里做持久化）。
+ *
+ * 暗色不是"把颜色调黑"，是同一个场景的另一个时刻：日落之后。
+ * 光源从"天光"换成"炉火"——琥珀更集中、范围更小，冷蓝退到远处当环境光，
+ * 表面本身带蓝紫底调（纯黑表面在印象派里等于"这里没有空气"）。
+ * ========================================================================== */
+html.dark {
+  --c-brand-50: #16243a;
+  --c-brand-100: #1a2c47;
+  --c-brand-200: #1e3a5f;
+
+  --c-ink-900: #eef2f7; /* 暗色下"深墨"变成最亮的文字色 */
+  --c-ink-800: #e2e8f0;
+  --c-ink-700: #cbd5e0;
+  --c-ink-600: #aab6c4;
+  --c-ink-500: #8d9aab;
+  --c-ink-400: #75828f;
+  --c-ink-300: #5b6774;
+  --c-ink-200: #38424f;
+  --c-ink-100: #2b3542;
+  --c-ink-50: #222b37;
+  --c-white: #1a222d;
+
+  --c-success-50: #14291e;
+  --c-warning-50: #2c2413;
+  --c-danger-50: #2e1a18;
+  --c-info-50: #232b35;
+
+  --bg-page: #121924;
+  --bg-surface: #1a2331;
+  --bg-surface-alt: #1e2836;
+  --bg-sunken: #101822;
+  --bg-hover: #232e3d;
+
+  --side-bg: #111823;
+  --side-bg-sub: #1a222d;
+  --side-item-hover: #212c3a;
+  --side-border: #27313f;
+
+  --header-bg: rgba(26, 35, 49, 0.82);
+
+  /* 光：夜里只剩一盏灯，高光更暖更弱，环境影几乎不带灰 */
+  --lit-warm: rgba(255, 232, 198, 0.07);
+  --surface-sheen: linear-gradient(
+    168deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0) 44%
+  );
+  --sh-ink: 224 45% 3%;
+  --sh-bounce: 36 92% 55%;
+
+  /* 页面底：天光退场，炉火收拢（暗色下笔触要再淡一半，深底最放大纹理） */
+  --page-sun: rgba(255, 190, 92, 0.055);
+  --page-sky: rgba(76, 116, 176, 0.12);
+  --page-brush: rgba(147, 187, 253, 0.008);
+
+  --side-lit-edge: rgba(255, 255, 255, 0.05);
+  --side-wash:
+    radial-gradient(22rem 12rem at 12% -4%, rgba(245, 166, 35, 0.14), transparent 58%),
+    radial-gradient(30rem 22rem at 112% 94%, rgba(58, 92, 145, 0.24), transparent 66%),
+    linear-gradient(178deg, #16202e 0%, #121a25 48%, #0e151f 100%);
+  --side-group-bg: rgba(255, 255, 255, 0.022);
+  --side-group-bg-hover: rgba(255, 255, 255, 0.05);
+  --side-group-bg-open: rgba(96, 154, 250, 0.14);
+
+  --glow-brand: 0 6px 20px -6px hsl(217 90% 62% / 0.45);
+  --glow-accent: 0 10px 26px -10px hsl(36 92% 55% / 0.5);
+
+  --sh-xs: 0 1px 2px hsl(var(--sh-ink) / 0.4);
+  --sh-sm:
+    0 1px 2px hsl(var(--sh-ink) / 0.45),
+    0 3px 8px -2px hsl(var(--sh-ink) / 0.4);
+  --sh-md:
+    0 2px 4px -2px hsl(var(--sh-ink) / 0.5),
+    0 8px 18px -4px hsl(var(--sh-ink) / 0.5);
+  --sh-lg:
+    0 4px 10px -4px hsl(var(--sh-ink) / 0.55),
+    0 16px 34px -8px hsl(var(--sh-ink) / 0.6);
+  --sh-xl:
+    0 10px 20px -8px hsl(var(--sh-ink) / 0.6),
+    0 28px 60px -12px hsl(var(--sh-ink) / 0.7);
+}
+
+/* ============================================================================
+ * 高对比度 / 减少动效：无障碍（a11y）
+ * ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --c-border: #8b96a3;
+    --c-ink-400: #4a5866;
+  }
+}

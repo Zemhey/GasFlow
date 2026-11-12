@@ -1,0 +1,406 @@
+/* ============================================================================
+ * 04-页面模式.css —— 页面级布局范式（工具条 / 页头 / 指标卡 / 打印）
+ * ----------------------------------------------------------------------------
+ * 这些类是"页面骨架"，各视图直接套用，保证 20+ 个页面长得一样。
+ * ========================================================================== */
+
+/* ------------------------------------------------------------------ 页头 */
+/* 每个页面顶部：标题 + 副标题（口径说明）+ 右侧操作区。
+   统一了原来各页面"标题字号不一、间距不一"的问题。 */
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+
+.page-head__main {
+  min-width: 0; /* 允许内部文字截断 */
+}
+
+.page-head__title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-semibold);
+  color: var(--c-ink-900);
+  letter-spacing: var(--ls-tight);
+  line-height: var(--lh-tight);
+}
+
+.page-head__title .el-icon {
+  color: var(--c-brand-500);
+  font-size: 20px;
+  /* 页头图标带一点透光，标题行才有"这一页是干什么的"的视觉锚点 */
+  filter: drop-shadow(0 3px 8px color-mix(in srgb, var(--c-brand-500) 45%, transparent));
+}
+
+.page-head__sub {
+  margin-top: var(--sp-1);
+  font-size: var(--fs-xs);
+  color: var(--c-ink-400);
+  line-height: var(--lh-normal);
+}
+
+.page-head__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* ---------------------------------------------------------------- 工具条 */
+/* 查询条件区：紧凑、可换行、右侧放主操作。
+   与 .row-wrap 的区别是它会自带下边距，且"撑满"语义更强。 */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-3);
+}
+
+.toolbar .spacer,
+.toolbar .grow {
+  flex: 1 1 auto;
+}
+
+/* 查询条件用"浅底卡片"包起来，和下面的数据表形成层次 */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  padding: var(--sp-3);
+  margin-bottom: var(--sp-3);
+  background: var(--bg-far);
+  border: 1px solid var(--c-border-light);
+  border-radius: var(--r-lg);
+  box-shadow: var(--rim-lit);
+}
+
+.filter-bar .grow {
+  flex: 1 1 auto;
+}
+
+.filter-bar__label {
+  font-size: var(--fs-xs);
+  color: var(--c-ink-400);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------ 指标卡组 */
+/* 看板 / 报表顶部的 KPI 卡片网格：自适应列数，不用 el-row 写死 span */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+
+.stat-card {
+  position: relative;
+  padding: var(--sp-4);
+  /* 一层"语义色的光"从左上角斜射进来（补色相邻才有活力），叠在受光面与纸色之上 */
+  background:
+    radial-gradient(
+      120% 88% at 0% 0%,
+      color-mix(in srgb, var(--stat-color, var(--c-brand-500)) 12%, transparent),
+      transparent 62%
+    ),
+    var(--surface-sheen),
+    var(--bg-surface);
+  border: 1px solid var(--c-border-light);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-sm), var(--rim-lit);
+  overflow: hidden;
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+
+/* 悬浮：往上浮一点，影变长变软，并把该卡的语义色透出来一点（不是加一圈描边） */
+.stat-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--stat-color, var(--c-brand-500)) 32%, var(--c-border-light));
+  box-shadow:
+    var(--sh-md),
+    var(--rim-lit),
+    0 14px 28px -16px color-mix(in srgb, var(--stat-color, var(--c-brand-500)) 55%, transparent);
+}
+
+/* 左侧色条：一条透光的竖边，比整块染色克制，也比平涂的色块更像被光照到 */
+.stat-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--stat-color, var(--c-brand-500)) 78%, #fff) 0%,
+    var(--stat-color, var(--c-brand-500)) 100%
+  );
+  box-shadow: 2px 0 10px -2px color-mix(in srgb, var(--stat-color, var(--c-brand-500)) 45%, transparent);
+}
+
+.stat-card__label {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-xs);
+  color: var(--c-ink-400);
+  letter-spacing: var(--ls-wide);
+}
+
+.stat-card__value {
+  margin: var(--sp-2) 0 var(--sp-1);
+  font-family: var(--font-num);
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-bold);
+  color: var(--c-ink-900);
+  letter-spacing: var(--ls-tight);
+  line-height: 1.15;
+}
+
+.stat-card__value small {
+  font-family: var(--font-sans);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-normal);
+  color: var(--c-ink-400);
+  margin-left: var(--sp-1);
+}
+
+.stat-card__sub {
+  font-size: var(--fs-xs);
+  color: var(--c-ink-400);
+  line-height: var(--lh-normal);
+}
+
+.stat-card__sub b {
+  color: var(--c-ink-700);
+  font-weight: var(--fw-semibold);
+}
+
+/* 语义配色：给 .stat-card 加 --stat-color 即可 */
+.stat-card--success { --stat-color: var(--c-success-500); }
+.stat-card--warning { --stat-color: var(--c-warning-500); }
+.stat-card--danger  { --stat-color: var(--c-danger-500); }
+.stat-card--info    { --stat-color: var(--c-ink-300); }
+
+/* 右上角趋势/对比指示：涨跌一眼可见 */
+.stat-card__trend {
+  position: absolute;
+  top: var(--sp-3);
+  right: var(--sp-4);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+}
+
+.stat-card__trend.up { color: var(--c-up); }
+.stat-card__trend.down { color: var(--c-down); }
+
+/* -------------------------------------------------------------- 合计条 */
+/* 表格下方的合计行（原生 HTML 版，与 el-table 的合计行互补） */
+.sum-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  padding: var(--sp-3) var(--sp-4);
+  margin-top: var(--sp-3);
+  background: var(--bg-far);
+  border: 1px solid var(--c-border-light);
+  border-radius: var(--r-lg);
+  box-shadow: var(--rim-lit);
+  font-size: var(--fs-sm);
+  color: var(--c-ink-500);
+}
+
+.sum-bar b {
+  font-family: var(--font-num);
+  color: var(--c-ink-900);
+  font-weight: var(--fw-semibold);
+  margin-left: var(--sp-1);
+}
+
+.sum-bar .sum-bar__danger b {
+  color: var(--c-danger-500);
+}
+
+/* ------------------------------------------------------- 提示 / 口径说明 */
+/* 页面底部的口径注解：小字、弱化、但保留可查 */
+.caliber-note {
+  margin-top: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-xs);
+  color: var(--c-ink-400);
+  line-height: var(--lh-normal);
+  border-left: 2px solid var(--c-brand-200);
+  /* 底色从竖条处淡淡晕开，像光渗进纸里，而不是切一块灰条 */
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--c-brand-500) 7%, var(--bg-surface-alt)) 0%,
+    transparent 70%
+  );
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+}
+
+.caliber-note b {
+  color: var(--c-ink-600);
+  font-weight: var(--fw-medium);
+}
+
+.hint {
+  font-size: var(--fs-xs);
+  color: var(--c-ink-400);
+  font-weight: var(--fw-normal);
+}
+
+/* 行内小图标提示：悬浮出 tooltip 的锚点 */
+.info-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: var(--r-full);
+  background: var(--c-ink-100);
+  color: var(--c-ink-400);
+  font-size: 10px;
+  cursor: help;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.info-dot:hover {
+  background: var(--c-brand-100);
+  color: var(--c-brand-600);
+}
+
+/* ---------------------------------------------------------- 表格包装器 */
+/* 表格外面套一层，负责滚动与圆角裁切；表头粘性由 el-table 自己处理 */
+.table-wrap {
+  border: 1px solid var(--c-border-light);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--bg-surface);
+  box-shadow: var(--sh-xs), var(--rim-lit);
+}
+
+/* 表格上方标题栏（表格需要自己的标题/图例时用） */
+.table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--c-border-light);
+  background: var(--bg-surface-alt);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--c-ink-700);
+}
+
+/* 图例：表格里的颜色含义（增/减/红字等） */
+.legend {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  font-size: var(--fs-xs);
+  color: var(--c-ink-400);
+  font-weight: var(--fw-normal);
+}
+
+.legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.legend__swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--c-ink-200);
+}
+
+/* ============================================================================
+ * 打印：报表页 / 对账单 / 配送清单要能直接打出来
+ * ========================================================================== */
+@media print {
+  @page {
+    margin: 12mm;
+  }
+
+  body {
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  .no-print,
+  .el-menu,
+  .el-header,
+  .el-aside,
+  .el-pagination,
+  .el-button,
+  .filter-bar,
+  .toolbar,
+  .page-head__actions,
+  .side,
+  .app-header {
+    display: none !important;
+  }
+
+  .el-main,
+  .app-main {
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .el-card {
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .print-area {
+    width: 100%;
+    font-size: 12px;
+    color: #000;
+  }
+
+  .print-area table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: auto;
+  }
+
+  .print-area th,
+  .print-area td {
+    border: 1px solid #999 !important;
+    padding: 4px 6px !important;
+  }
+
+  .print-area tr {
+    page-break-inside: avoid;
+  }
+
+  .print-area thead {
+    display: table-header-group; /* 长表格每页重复表头 */
+  }
+
+  .stat-card,
+  .surface {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}

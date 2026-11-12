@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GasInventory.Api/GasInventory.Api.csproj" />
+    <Project Path="src/GasInventory.Domain/GasInventory.Domain.csproj" />
+    <Project Path="src/GasInventory.Infrastructure/GasInventory.Infrastructure.csproj" />
+  </Folder>
+</Solution>

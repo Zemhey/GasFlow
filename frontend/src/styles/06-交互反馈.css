@@ -1,0 +1,291 @@
+/* ============================================================================
+ * 06-交互反馈.css —— 状态提示、过渡、微交互
+ * ----------------------------------------------------------------------------
+ * 原则：任何"用户操作 → 系统响应"都必须有可见反馈，且不能让布局跳动。
+ *   加载中 → 骨架/遮罩（不用空白页）
+ *   成功   → 短暂高亮（不打断操作）
+ *   失败   → 就地红字 + 可重试（不只弹一个 toast 就没了）
+ *   空数据 → 明确说明"为什么空 + 下一步做什么"
+ * ========================================================================== */
+
+/* ------------------------------------------------------- 1. 页面切换过渡 */
+/* 新页不是"被换上来的"，是"光铺开之后显出来的"：淡入 + 一点点抬升，
+   离场快（不留等待），入场慢半拍（给眼睛跟上版面的时间）。 */
+.page-enter-active {
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+}
+
+.page-leave-active {
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-leave-to {
+  opacity: 0;
+}
+
+/* --------------------------------------------------- 2. 数据加载骨架屏 */
+/* 表格骨架：与真实表格同高同行数，加载完成时不会"跳一下" */
+.skeleton-table {
+  padding: var(--sp-3);
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2) 0;
+}
+
+.skeleton-row .skeleton {
+  height: 14px;
+}
+
+.skeleton-row .skeleton:first-child {
+  flex: 0 0 100px;
+}
+
+.skeleton-row .skeleton:nth-child(2) {
+  flex: 1 1 auto;
+}
+
+.skeleton-row .skeleton:last-child {
+  flex: 0 0 80px;
+}
+
+/* 指标卡骨架 */
+.skeleton-stat {
+  padding: var(--sp-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--c-border-light);
+  border-radius: var(--r-lg);
+}
+
+.skeleton-stat .skeleton {
+  height: 12px;
+  margin-bottom: var(--sp-3);
+}
+
+.skeleton-stat .skeleton:last-child {
+  height: 26px;
+  width: 60%;
+  margin-bottom: 0;
+}
+
+/* --------------------------------------- 3. 行级"刚更新"高亮（写后反馈） */
+/* 过账 / 审核 / 保存成功后，让那一行闪一下品牌色底，用户知道"改的是这行" */
+@keyframes row-flash {
+  0% { background-color: var(--c-brand-100); }
+  100% { background-color: transparent; }
+}
+
+.row-flash > td.el-table__cell {
+  animation: row-flash 1.1s var(--ease-out);
+}
+
+/* 删除行：淡出后再移除（配合 el-table 的数据变更） */
+@keyframes row-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0.3; }
+}
+
+.row-fading > td.el-table__cell {
+  animation: row-fade-out var(--dur-slow) var(--ease-out);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------- 4. 就地错误与空态 */
+/* 错误面板：不遮挡页面，给出原因 + 重试入口 */
+.error-panel {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-3);
+  background: var(--c-danger-50);
+  border: 1px solid #f2c9c5;
+  border-radius: var(--r-md);
+  color: var(--c-danger-700);
+  font-size: var(--fs-sm);
+  animation: panel-in var(--dur-base) var(--ease-out);
+}
+
+.error-panel .el-icon {
+  font-size: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.error-panel__body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.error-panel__retry {
+  flex-shrink: 0;
+}
+
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 空态增强：图标 + 主文案 + 说明 + 可选操作按钮 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-12) var(--sp-4);
+  text-align: center;
+}
+
+.empty-state__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: var(--sp-2);
+  border-radius: var(--r-full);
+  /* 圆底用"远处天光"收边：平灰的圆在这里像贴了个靶心 */
+  background: radial-gradient(72% 72% at 32% 26%, var(--c-brand-50), var(--c-ink-50) 72%);
+  color: var(--c-ink-300);
+  font-size: 28px;
+}
+
+.empty-state__title {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-medium);
+  color: var(--c-ink-600);
+}
+
+.empty-state__desc {
+  font-size: var(--fs-xs);
+  color: var(--c-ink-400);
+  max-width: 420px;
+  line-height: var(--lh-loose);
+}
+
+/* ------------------------------------------- 5. 按钮加载态（不改变宽度） */
+/* Element Plus 的 loading 会给按钮加 padding，导致工具条里其它按钮跟着位移。
+   这里锁住最小宽度，让"点下去"不引起布局抖动。 */
+.el-button.is-loading {
+  pointer-events: none;
+}
+
+.el-button.is-loading::before {
+  border-radius: inherit;
+}
+
+/* --------------------------------------------- 6. 数值变化闪烁（看板） */
+@keyframes value-pulse {
+  0% { color: var(--c-brand-500); }
+  100% { color: inherit; }
+}
+
+.value-changed {
+  animation: value-pulse 900ms var(--ease-out);
+}
+
+/* ------------------------------------------------- 7. 可点击行/卡片暗示 */
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:active {
+  transform: scale(0.995);
+}
+
+/* 链接型文本：悬浮出现下划线，明确可点 */
+.link-text {
+  color: var(--c-brand-600);
+  cursor: pointer;
+  border-radius: var(--r-xs);
+  padding: 0 2px;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.link-text:hover {
+  background: var(--c-brand-50);
+  color: var(--c-brand-700);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* --------------------------------------------------- 8. 状态点（在线/离线） */
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--r-full);
+  background: var(--c-ink-300);
+  margin-right: var(--sp-1);
+  flex-shrink: 0;
+}
+
+.status-dot--ok { background: var(--c-success-500); box-shadow: 0 0 0 3px var(--c-success-50); }
+.status-dot--warn { background: var(--c-warning-500); box-shadow: 0 0 0 3px var(--c-warning-50); }
+.status-dot--bad { background: var(--c-danger-500); box-shadow: 0 0 0 3px var(--c-danger-50); }
+
+/* --------------------------------------------- 9. 移动端抽屉式筛选面板 */
+/* 手机上筛选条件收进抽屉，由"筛选"按钮唤起，页面留给数据本身。 */
+.mobile-filter-toggle {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .mobile-filter-toggle {
+    display: inline-flex;
+  }
+
+  /* 被标记为"移动端隐藏"的筛选条默认收起 */
+  .filter-collapsible {
+    display: none;
+  }
+
+  .filter-collapsible.is-open {
+    /* 展开后仍是"筛选条"：让它按 05-响应式.css 给 .filter-bar 的纵向排布走，
+       否则这里写 flex 会把 flex-direction: column 覆盖成 row，
+       配合 align-items: stretch 会把输入框拉成整宽巨块（批次 3 实测）。 */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* --------------------------------------------- 10. 图表容器统一高度与空态 */
+.chart-box {
+  position: relative;
+  width: 100%;
+  min-height: 260px;
+}
+
+.chart-box--sm { min-height: 200px; }
+.chart-box--lg { min-height: 340px; }
+
+.chart-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  color: var(--c-ink-300);
+  font-size: var(--fs-sm);
+  background: var(--bg-surface);
+}
+
+/* echarts 的 resize 在容器尺寸变化时靠 ResizeObserver 触发，
+   这里给个过渡，窗口拖拽时不会"跳帧" */
+.chart-box > div {
+  transition: opacity var(--dur-base) var(--ease-out);
+}

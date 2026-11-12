@@ -1,0 +1,319 @@
+/* ============================================================================
+ * 05-响应式.css —— 断点与移动端适配
+ * ----------------------------------------------------------------------------
+ * 断点（移动优先的反向覆盖，本项目以桌面为主，故用 max-width 逐级降级）：
+ *   ≥1600px  超宽屏：内容居中限宽，避免表格被拉成"面条"
+ *   ≥1200px  桌面标准
+ *   992–1199 小笔记本 / 平板横屏
+ *   768–991  平板竖屏：侧栏折叠为抽屉，工具条换行，表格允许横滚
+ *   ≤767px   手机：单列指标卡、抽屉式筛选、表格转"卡片行"
+ * ========================================================================== */
+
+/* ------------------------------------------------- 超宽屏：内容不再无限拉长 */
+@media (min-width: 1600px) {
+  .app-main__inner {
+    max-width: var(--content-max);
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+/* ----------------------------------------------- 小笔记本：压缩内边距与侧栏 */
+@media (max-width: 1199px) {
+  :root {
+    --side-w: 200px;
+    --sp-4: 14px;
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: var(--sp-3);
+  }
+
+  .stat-card__value {
+    font-size: var(--fs-xl);
+  }
+}
+
+/* -------------------------------------------------------- 平板竖屏（768–991） */
+@media (max-width: 991px) {
+  /* 工具条：允许换行，输入框不再强行固定宽度（改由容器撑） */
+  .toolbar,
+  .filter-bar {
+    align-items: stretch;
+  }
+
+  .toolbar > .el-input,
+  .toolbar > .el-select,
+  .toolbar > .el-date-editor,
+  .filter-bar > .el-input,
+  .filter-bar > .el-select,
+  .filter-bar > .el-date-editor {
+    width: auto !important;
+    flex: 1 1 150px;
+    min-width: 0;
+  }
+
+  /* 撑满整行的 spacer 在窄屏会挤掉内容，移动端交给 gap 排版 */
+  .toolbar .spacer,
+  .toolbar .grow,
+  .filter-bar .grow {
+    display: none;
+  }
+
+  .page-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--sp-2);
+  }
+
+  .page-head__actions {
+    justify-content: flex-start;
+  }
+
+  .page-head__title {
+    font-size: var(--fs-lg);
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: var(--sp-2);
+  }
+
+  .stat-card {
+    padding: var(--sp-3);
+  }
+
+  .stat-card__value {
+    font-size: var(--fs-lg);
+  }
+
+  /* 表格：允许横向滚动，而不是把列压变形。
+     横向滚动是移动端看宽表格最可靠的做法（列语义不会被破坏）。 */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 滚动提示：右侧渐隐，暗示"还能往右拖" */
+  .table-scroll-hint {
+    position: relative;
+  }
+
+  .table-scroll-hint::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 18px;
+    pointer-events: none;
+    background: linear-gradient(to left, rgba(23, 33, 47, 0.08), transparent);
+  }
+}
+
+/* ------------------------------------------------------------- 手机（≤767） */
+@media (max-width: 767px) {
+  :root {
+    --header-h: 52px;
+    --sp-3: 10px;
+    --fs-2xl: 20px;
+    --fs-xl: 17px;
+  }
+
+  /* 页头：标题与操作按钮分层，按钮靠左自然换行 */
+  .page-head__actions {
+    flex-wrap: wrap;
+  }
+
+  .page-head__actions .el-button {
+    flex: 1 1 auto;
+  }
+
+  /* 指标卡：手机一律两列，三列会挤到看不清数字 */
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-2);
+  }
+
+  .stat-card {
+    padding: var(--sp-3);
+  }
+
+  .stat-card__label {
+    font-size: 11px;
+  }
+
+  .stat-card__value {
+    font-size: var(--fs-lg);
+    margin: var(--sp-1) 0;
+  }
+
+  .stat-card__sub {
+    font-size: 11px;
+  }
+
+  /* 工具条：所有控件撑满一行，点按热区最大化 */
+  .toolbar,
+  .filter-bar {
+    flex-direction: column;
+    /* 用 flex-start 而不是 stretch：stretch 会让"高度未定义"的包装层
+       （el-input / el-select 的外框）被拉成一大块空白，手机上看着像坏掉了。
+       宽度已经由下面 width:100% 控制，不需要 stretch。 */
+    align-items: flex-start;
+    gap: var(--sp-2);
+  }
+
+  .toolbar > *,
+  .filter-bar > * {
+    width: 100% !important;
+    max-width: none;
+    /* ⚠ 必须显式清掉 flex 简写并用 !important：
+       Element Plus 给 el-input 算出的 flex 是 `1 1 150px`（来自 style="width:220px" 的基准），
+       在纵向 flex 里 flex-basis(150px) 变成了**高度**基准，
+       输入框被拉成 150px 高的大白块（批次 3 实测到）。
+       Element Plus 的样式在全局之后加载，不加 !important 覆盖不掉。 */
+    flex: 0 0 auto !important;
+    align-self: stretch;
+    height: auto;
+  }
+
+  /* 按钮仍保留正常触控高度，不被压成一条 */
+  .toolbar > .el-button,
+  .filter-bar > .el-button {
+    min-height: var(--ctl-h);
+  }
+
+  .toolbar .el-button,
+  .filter-bar .el-button {
+    margin-left: 0 !important;
+  }
+
+  .sum-bar {
+    gap: var(--sp-2);
+    font-size: var(--fs-xs);
+  }
+
+  /* 分页：手机上只留上一页/下一页 + 总数，页码列表会换行很难看 */
+  .el-pagination {
+    justify-content: center !important;
+    flex-wrap: wrap;
+  }
+
+  .el-pagination .el-pager {
+    display: none;
+  }
+
+  .el-pagination__sizes,
+  .el-pagination__jump {
+    display: none !important;
+  }
+
+  /* 对话框/抽屉：手机全屏，贴近原生 App 体验 */
+  .el-dialog {
+    width: 100% !important;
+    max-width: none;
+    margin: 0 !important;
+    border-radius: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .el-dialog__body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+  }
+
+  .el-message-box {
+    width: calc(100vw - 32px) !important;
+    max-width: none;
+  }
+
+  .el-message {
+    min-width: 0;
+    width: calc(100vw - 24px);
+    left: 12px;
+    right: 12px;
+    transform: none;
+  }
+}
+
+/* ------------------------------------- 移动端：宽表格转"主从卡片"（可选启用） */
+/* 给 el-table 加 class="table-card-mode"，每行变成一张小卡片：
+   首列作为标题，其余列"标签：值"竖排。适合手机上查看少量数据。 */
+@media (max-width: 767px) {
+  .table-card-mode .el-table__header-wrapper {
+    display: none;
+  }
+
+  .table-card-mode .el-table__body,
+  .table-card-mode .el-table__body tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .table-card-mode .el-table__row {
+    display: block;
+    margin-bottom: var(--sp-2);
+    border: 1px solid var(--c-border-light);
+    border-radius: var(--r-md);
+    background: var(--bg-surface);
+    box-shadow: var(--sh-xs);
+    overflow: hidden;
+  }
+
+  .table-card-mode .el-table__row > td.el-table__cell {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--sp-3);
+    width: 100% !important;
+    padding: var(--sp-2) var(--sp-3) !important;
+    border: none !important;
+    border-bottom: 1px solid var(--c-border-light) !important;
+    text-align: right !important;
+  }
+
+  .table-card-mode .el-table__row > td.el-table__cell:last-child {
+    border-bottom: none !important;
+  }
+
+  /* 用单元格的 label 作为"左侧标签" */
+  .table-card-mode .el-table__row > td.el-table__cell::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    font-size: var(--fs-xs);
+    color: var(--c-ink-400);
+    font-weight: var(--fw-medium);
+    text-align: left;
+  }
+}
+
+/* --------------------------------------------- 触屏设备：加大可点区域（≥44px） */
+@media (pointer: coarse) {
+  .el-button--small,
+  .el-button.is-link {
+    min-height: 34px;
+  }
+
+  .el-table .el-button.is-link {
+    padding: var(--sp-2) var(--sp-2);
+  }
+
+  .el-checkbox,
+  .el-radio {
+    min-height: 32px;
+  }
+}
+
+/* --------------------------------------------------- 横屏手机：压缩纵向空间 */
+@media (max-height: 520px) and (orientation: landscape) {
+  .stat-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .stat-card__sub {
+    display: none;
+  }
+}

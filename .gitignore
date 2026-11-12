@@ -1,0 +1,60 @@
+# ─── .NET ────────────────────────────────────────────────
+bin/
+obj/
+_build_check/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+
+# ─── Node / 前端 ─────────────────────────────────────────
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+
+# ─── 构建与发布产物（可用脚本重新生成）───────────────────
+publish/
+deploy/*.tar.gz
+deploy/*.tar.gz.sha256
+# 后端 wwwroot 是 frontend/dist 的拷贝，由构建生成
+backend/src/GasInventory.Api/wwwroot/assets/
+# 静态演示包的构建与抓取产物（源码在 static-demo/ 的 md 与 nginx 配置里）
+static-demo/site/
+static-demo/work/
+
+# ─── 运行期产物 / 日志 ───────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ─── 数据库备份与本地数据 ────────────────────────────────
+*.bak
+*.mdf
+*.ldf
+_backup/
+etl/data/extracted.json
+
+# ─── 仅本地保留、不对外提交的内部资料 ────────────────────
+_probe/
+_setup/
+_代码索引/
+static-demo/
+
+# ─── 编辑器 / 系统 ───────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# ─── 本地敏感配置（连接串含口令，用 .example 模板代替）───
+appsettings.Local.json
+appsettings.Development.local.json
+.env
+.env.local

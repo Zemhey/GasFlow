@@ -1,0 +1,31 @@
+# 统一换行：源码入库用 LF，检出到 Windows 自动转 CRLF
+* text=auto
+
+# 明确文本类型
+*.cs      text diff=csharp
+*.ts      text
+*.vue     text
+*.js      text
+*.json    text
+*.md      text
+*.sql     text
+*.yml     text
+*.yaml    text
+
+# ⚠ Windows 批处理必须是 CRLF + GBK，否则中文乱码 / 解析失败
+*.bat     text eol=crlf
+*.cmd     text eol=crlf
+*.ps1     text eol=crlf
+
+# 二进制：不要做任何换行或 diff 处理
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.ico     binary
+*.svg     text
+*.zip     binary
+*.gz      binary
+*.dll     binary
+*.pdb     binary
+*.exe     binary
